@@ -13,14 +13,14 @@ export function InviteGuestStep({emailsToInvite, openConfirmModal, openGuestModa
             <button type="button" onClick={openGuestModal} className="flex items-center gap-2 flex-1">
                 <UserRoundPlus className="size-5 text-zinc-400"/>
                 {emailsToInvite.length > 0 ? (
-                  <span className="text-zinc-100 text-lg flex-1 text-left">{emailsToInvite.length} pessoas convidadas</span>
+                  <span className="text-zinc-100 text-md md:text-lg flex-1 text-left">{emailsToInvite.length} pessoas convidadas</span>
                 ): (
-                  <span className="text-zinc-400 text-lg flex-1 text-left">Quem estará na viagem?</span>
+                  <span className="text-zinc-400 text-md md:text-lg flex-1 text-left">Quem estará na viagem?</span>
                 )}                
             </button> 
 
             <Button onClick={openConfirmModal} variant="primary">
-                Confirmar viagem
+                <span className="hidden md:inline">Confirmar viagem</span>
                 <ArrowRight className="size-5" />
             </Button>
         </div>  

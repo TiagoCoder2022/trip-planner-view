@@ -4,58 +4,64 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from "react";
 import { api } from "../../lib/axios";
 import { format, parseISO } from "date-fns";
-
-interface Trip {
-    id: string;
-    destination: string;
-    startsAt: string;
-    endsAt: string;
-    is_confirmed: boolean;
-}
+import { UpdateTripModal } from "./update-trip-modal";
+import { useDetailsContext } from "../contex/details-context"; 
 
 export function DestinationAndDateHeader() {
-    const [trip, setTrip] = useState<Trip | undefined>(undefined);
+    const { trip, setTrip } = useDetailsContext();
+    const [isUpdateTripModalOpen, setIsUpdateTripModalOpen] = useState(false);
+    
     const { tripId } = useParams();
+
+    function openUpdateTripModal() {
+        setIsUpdateTripModalOpen(true);
+    }
+
+    function closeUpdateTripModal() {
+        setIsUpdateTripModalOpen(false);
+    }
 
     useEffect(() => {
         const fetchTrip = async () => {
             try {
                 const response = await api.get(`/trips/${tripId}`);
-               
                 setTrip(response.data);
-                
             } catch (error) {
                 console.error("Failed to fetch trip:", error);
             }
         };
 
         fetchTrip();
-    }, [tripId]);      
+    }, [tripId, setTrip]);     
     
     const displayedDate = trip
-        ? format(parseISO(trip.startsAt), "dd' de 'LLL").concat(' até ').concat(format(parseISO(trip.endsAt), "dd' de 'LLL"))
+        ? format(parseISO(trip.startsAt), "dd'/'MM").concat(' - ').concat(format(parseISO(trip.endsAt), "dd'/'MM"))
         : null;
 
     return (
         <div className="px-4 h-16 rounded-xl bg-zinc-900 shadow-shape flex items-center justify-between">
-            <div className="flex items-center gap-2">
-                <MapPin className="size-5 text-zinc-400" />
-                <span className="text-zinc-100">{trip?.destination}</span>
+            <div className="flex items-center md:gap-2 gap-1">
+                <MapPin className="size-4 text-zinc-400" />
+                <span className="text-zinc-100 text-md md:text-lg overflow-hidden whitespace-nowrap text-ellipsis">{trip?.destination}</span>
             </div>
 
-            <div className="flex items-center gap-5">
-                <div className="flex items-center gap-2">
-                    <Calendar className="size-5 text-zinc-400" />
-                    <span className="text-zinc-100">{displayedDate}</span>
+            <div className="flex items-center md:gap-5 gap-3">
+                <div className="flex items-center md:gap-2 gap-1">
+                    <Calendar className="size-4 md:size-5 text-zinc-400" />
+                    <span className="text-zinc-100 text-md md:text-lg overflow-hidden whitespace-nowrap text-ellipsis">{displayedDate}</span>
                 </div>
 
-                <div className="w-px h-6 bg-zinc-800"></div>
+                <div className="w-px h-6 bg-zinc-800 hidden md:inline"></div>
 
-                <Button variant="secondary">
-                    Alterar local/data
+                <Button onClick={openUpdateTripModal} variant="secondary">
+                    <span className="hidden md:inline">Alterar local/data</span>
                     <Settings2 className="size-5" />
                 </Button>
             </div>
+
+            {isUpdateTripModalOpen && (
+                <UpdateTripModal closeCreateActiveModal={closeUpdateTripModal} />
+            )}
         </div>
     );
 }
